@@ -1,0 +1,22 @@
+apiVersion: dapr.io/v1alpha1
+kind: Component
+metadata:
+  name: statestore
+spec:
+  type: state.mongodb
+  version: v1
+  metadata:
+  - name: host
+    value: "localhost:27017"
+  - name: username
+    value: "admin"
+  - name: password
+    value: "password"
+  - name: databaseName
+    value: "daprStore"
+  - name: collectionName
+    value: "daprStore"
+  - name: params
+    value: "?authSource=admin"
+
+    

@@ -1,0 +1,59 @@
+{
+    "info": {
+        "name": "dapr-pilot",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+        "description": ""
+    },
+    "item": [
+        {
+            "name": "Add people",
+            "request": {
+                "method": "POST",
+                "url": {
+                    "raw": "http://localhost:3000/people",
+                    "path": [
+                        "people"
+                    ],
+                    "protocol": "http",
+                    "host": [
+                        "localhost"
+                    ],
+                    "port": "3000"
+                },
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "options": {
+                        "raw": {
+                            "language": "json"
+                        }
+                    },
+                    "raw": "{\n  \"id\": \"1\", \n  \"name\": \"Carlos\",\n  \"surname\": \"Perez\",\n  \"marital_status\": \"Single\"\n}"
+                }
+            }
+        },
+        {
+            "name": "Get people",
+            "request": {
+                "method": "GET",
+                "url": {
+                    "raw": "http://localhost:3000/people/1",
+                    "path": [
+                        "people",
+                        "1"
+                    ],
+                    "protocol": "http",
+                    "host": [
+                        "localhost"
+                    ],
+                    "port": "3000"
+                }
+            }
+        }
+    ]
+}

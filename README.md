@@ -84,4 +84,22 @@ dapr run --app-id people-processor --resources-path ../dapr/self-hosted/resource
 
 dapr run --app-port 3000 --app-id order-processor --app-protocol http --dapr-http-port 3501 -- npm start
 
-dapr run --app-id order-processor --dapr-http-port 3500
+dapr run --app-id order-processor --dapr-http-port 3501
+
+
+## Building your image
+cd people
+docker build . -t dapr-pilot/node-people-server
+
+
+## Run the image
+cd people
+docker compose up
+
+## Stop the image
+
+docker compose down
+
+## Go inside the container
+
+docker exec -it <container id> /bin/bash

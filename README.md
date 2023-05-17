@@ -1,5 +1,6 @@
 # dapr-pilot
 
+
 ## start microK8s
 
 microk8s start
@@ -38,8 +39,6 @@ Redis&reg; can be accessed on the following DNS names from within your cluster:
     redis-master.redis.svc.cluster.local for read/write operations (port 6379)
     redis-replicas.redis.svc.cluster.local for read-only operations (port 6379)
 
-
-
 To get your password run:
 
     export REDIS_PASSWORD=$(kbuectl get secret --namespace redis redis -o jsonpath="{.data.redis-password}" | base64 -d)
@@ -69,15 +68,20 @@ To connect to your database from outside the cluster execute the following comma
 
 kubectl get pods --namespace dapr-system
 
+
 ## apply dapr component
  
-microk8s kubectl apply -f ./dapr/kubernetes/redis-state.yaml -n default
+microk8s kubectl apply -f ../dapr/kubernetes/redis-state.yaml -n default
+
 
 ## dapr dashboard on k8s
 dapr dashboard -k
 
+
 ## dapr run local
 
-dapr run --app-id people-processor --resources-path dapr/self-hosted/resources/redis/  -- npm run start
+dapr run --app-id people-processor --resources-path ../dapr/self-hosted/resources/redis/ --app-port 3000 --app-protocol http --dapr-http-port 3501 -- npm run start
 
 dapr run --app-port 3000 --app-id order-processor --app-protocol http --dapr-http-port 3501 -- npm start
+
+dapr run --app-id order-processor --dapr-http-port 3500

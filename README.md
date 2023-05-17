@@ -1,5 +1,37 @@
 # dapr-pilot
 
+##  self-Hosted
+
+### dapr run local
+
+dapr run --app-id people-processor --resources-path ../dapr/self-hosted/resources/redis/ --app-port 3000 --app-protocol http --dapr-http-port 3501 -- npm run start
+
+dapr run --app-port 3000 --app-id order-processor --app-protocol http --dapr-http-port 3501 -- npm start
+
+dapr run --app-id order-processor --dapr-http-port 3501
+
+
+### Building your image
+cd people
+docker build . -t dapr-pilot/node-people-server
+
+
+
+### Run the image
+cd people
+docker compose up
+
+
+### Stop the image
+
+docker compose down
+
+
+### Go inside the container
+
+docker exec -it <container id> /bin/bash
+
+
 ## Kubernetes
 
 ### start microK8s
@@ -72,40 +104,50 @@ kubectl get pods --namespace dapr-system
 
 ### apply dapr component
  
-microk8s kubectl apply -f ../dapr/kubernetes/redis-state.yaml -n default
+microk8s kubectl apply -f ./kubernetes/redis-state.yaml -n default
 
 
 ### dapr dashboard on k8s
 dapr dashboard -k
 
-##  self-Hosted
+### deploy to registry
 
-### dapr run local
+microk8s enable registry
 
-dapr run --app-id people-processor --resources-path ../dapr/self-hosted/resources/redis/ --app-port 3000 --app-protocol http --dapr-http-port 3501 -- npm run start
-
-dapr run --app-port 3000 --app-id order-processor --app-protocol http --dapr-http-port 3501 -- npm start
-
-dapr run --app-id order-processor --dapr-http-port 3501
-
-
-### Building your image
 cd people
-docker build . -t dapr-pilot/node-people-server
+docker build . -t localhost:32000/node-people-server | docker tag <image_id> localhost:32000/node-people-server 
+docker push localhost:32000/node-people-server 
+
+NOTE: Pushing to insecure registry may fail in some versions of Docker unless the daemon is explicitly configured 
+to trust this registry. To address this we need to edit /etc/docker/daemon.json and add:
+
+{
+  "insecure-registries" : ["localhost:32000"]
+}
 
 
+### deploy service 
 
-### Run the image
-cd people
-docker compose up
-
-
-### Stop the image
-
-docker compose down
+microk8s kubectl apply -f ./kubernetes/deploy.yaml -n default
 
 
-### Go inside the container
+### remove service 
+kubectl  get  deployments -n default
+microk8s kubectl delete deployment people-node-app -n default
 
-docker exec -it <container id> /bin/bash
 
+### check service
+
+microk8s kubectl get pods -n default | grep people-node-app
+
+microk8s kubectl logs <pod-id> node
+microk8s kubectl logs <pod-id> daprd
+
+
+### test service
+
+microk8s kubectl get pods -n default | grep people-node-app
+ubectl port-forward <pod-id> 3000:3000
+
+### install monfodb
+microk8s kubectl create namespace mongodb

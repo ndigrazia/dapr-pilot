@@ -1,0 +1,51 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: people-node-app
+  labels:
+    app: node
+spec:
+  selector:
+    app: node
+  ports:
+  - protocol: TCP
+    port: 3000
+    targetPort: 3000
+  
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: people-node-app
+  labels:
+    app: node
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: node
+  template:
+    metadata:
+      labels:
+        app: node
+      annotations:
+        dapr.io/enabled: "true"
+        dapr.io/app-id: "people-node-app"
+        dapr.io/app-port: "3000"
+        dapr.io/enable-api-logging: "true"
+    spec:
+      containers:
+      - name: node
+        image: localhost:32000/node-people-server:latest
+        env:
+        - name: APP_PORT
+          value: "3000"
+        - name: DAPR_PROTOCOL
+          value: "http"
+        - name: DAPR_HOST
+          value: "localhost"
+        - name: DAPR_HTTP_PORT
+          value: "3500"
+        ports:
+        - containerPort: 3000
+        imagePullPolicy: Always

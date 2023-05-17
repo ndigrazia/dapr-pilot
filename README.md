@@ -102,7 +102,7 @@ To connect to your database from outside the cluster execute the following comma
 kubectl get pods --namespace dapr-system
 
 
-### apply dapr component
+### apply dapr component - Redis
  
 microk8s kubectl apply -f ./kubernetes/redis-state.yaml -n default
 
@@ -149,5 +149,34 @@ microk8s kubectl logs <pod-id> daprd
 microk8s kubectl get pods -n default | grep people-node-app
 ubectl port-forward <pod-id> 3000:3000
 
+
+### stop redis
+
+kubectl scale -n redis statefulset redis-replicas --replicas=0
+kubectl scale -n redis statefulset redis-master --replicas=0
+
+
+### start redis
+
+kubectl scale -n redis statefulset redis-replicas --replicas=3
+kubectl scale -n redis statefulset redis-master --replicas=1
+
+
 ### install monfodb
 microk8s kubectl create namespace mongodb
+
+microk8s kubectl apply -f ./kubernetes/kubernetes-mongodb-main/ -n mongodb
+microk8s kubectl delete -f ./kubernetes/kubernetes-mongodb-main/ -n mongodb
+
+
+### uninstall helm
+
+helm uninstall <release>  --namespace mongodb
+
+### apply dapr component - Mongo
+ TODO
+microk8s kubectl apply -f ./kubernetes/statestore-mongodb.yaml -n default
+
+
+
+

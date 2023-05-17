@@ -1,22 +1,23 @@
 # dapr-pilot
 
+## Kubernetes
 
-## start microK8s
+### start microK8s
 
 microk8s start
 
-## install dapr using helm
+### install dapr using helm
 helm repo add dapr https://dapr.github.io/helm-charts/
 helm repo update
 microk8s kubectl create namespace dapr-system
 helm install dapr dapr/dapr --namespace dapr-system
 
 
-## search charts
+### search charts
 helm search repo dapr --devel --versions
 
 
-## install redis
+### install redis
 
 helm repo add bitnami https://charts.bitnami.com/bitnami
 helm repo update
@@ -64,21 +65,22 @@ To connect to your database from outside the cluster execute the following comma
     REDISCLI_AUTH="$REDIS_PASSWORD" redis-cli -h 127.0.0.1 -p 6379
     
 
-## check Dapr install
+### check Dapr install
 
 kubectl get pods --namespace dapr-system
 
 
-## apply dapr component
+### apply dapr component
  
 microk8s kubectl apply -f ../dapr/kubernetes/redis-state.yaml -n default
 
 
-## dapr dashboard on k8s
+### dapr dashboard on k8s
 dapr dashboard -k
 
+##  self-Hosted
 
-## dapr run local
+### dapr run local
 
 dapr run --app-id people-processor --resources-path ../dapr/self-hosted/resources/redis/ --app-port 3000 --app-protocol http --dapr-http-port 3501 -- npm run start
 
@@ -87,19 +89,23 @@ dapr run --app-port 3000 --app-id order-processor --app-protocol http --dapr-htt
 dapr run --app-id order-processor --dapr-http-port 3501
 
 
-## Building your image
+### Building your image
 cd people
 docker build . -t dapr-pilot/node-people-server
 
 
-## Run the image
+
+### Run the image
 cd people
 docker compose up
 
-## Stop the image
+
+### Stop the image
 
 docker compose down
 
-## Go inside the container
+
+### Go inside the container
 
 docker exec -it <container id> /bin/bash
+

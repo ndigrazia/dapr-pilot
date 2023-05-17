@@ -8,9 +8,6 @@ services:
       ports:
         - "3000:3000"
         - "50002:50002" # Dapr instances communicate over gRPC so we need to expose the gRPC port
-      depends_on:
-        - redis
-        - placement
       environment:
         - "APR_PROTOCOL=http"
         - "DAPR_HOST=localhost"

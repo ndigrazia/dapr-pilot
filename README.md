@@ -181,9 +181,6 @@ kubectl port-forward <pod-id> 27017:27017 -n mongodb
 
 microk8s kubectl delete -f ./kubernetes/kubernetes-mongodb-main/ -n mongodb
 
-### uninstall helm
-
-helm uninstall <release>  --namespace mongodb
 
 ### apply dapr component - MongoDB
 

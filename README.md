@@ -39,6 +39,7 @@ docker exec -it <container id> /bin/bash
 microk8s start
 
 ### install dapr using helm
+
 helm repo add dapr https://dapr.github.io/helm-charts/
 helm repo update
 microk8s kubectl create namespace dapr-system
@@ -103,11 +104,13 @@ kubectl get pods --namespace dapr-system
 
 
 ### apply dapr component - Redis
- 
+
+microk8s kubectl delete -f ./kubernetes/statestore-mongodb.yaml -n default
 microk8s kubectl apply -f ./kubernetes/redis-state.yaml -n default
 
 
 ### dapr dashboard on k8s
+
 dapr dashboard -k
 
 ### deploy to registry
@@ -131,11 +134,6 @@ to trust this registry. To address this we need to edit /etc/docker/daemon.json 
 microk8s kubectl apply -f ./kubernetes/deploy.yaml -n default
 
 
-### remove service 
-kubectl  get  deployments -n default
-microk8s kubectl delete deployment people-node-app -n default
-
-
 ### check service
 
 microk8s kubectl get pods -n default | grep people-node-app
@@ -147,7 +145,13 @@ microk8s kubectl logs <pod-id> daprd
 ### test service
 
 microk8s kubectl get pods -n default | grep people-node-app
-ubectl port-forward <pod-id> 3000:3000
+kubectl port-forward <pod-id> 3000:3000 -n default
+
+
+### remove service 
+
+kubectl  get  deployments -n default
+microk8s kubectl delete deployment people-node-app -n default
 
 
 ### stop redis
@@ -162,19 +166,28 @@ kubectl scale -n redis statefulset redis-replicas --replicas=3
 kubectl scale -n redis statefulset redis-master --replicas=1
 
 
-### install monfodb
+### install mongodb
+
 microk8s kubectl create namespace mongodb
-
 microk8s kubectl apply -f ./kubernetes/kubernetes-mongodb-main/ -n mongodb
-microk8s kubectl delete -f ./kubernetes/kubernetes-mongodb-main/ -n mongodb
 
+
+### connect mongodb
+
+microk8s kubectl get pods -n mongodb | grep mongo
+kubectl port-forward <pod-id> 27017:27017 -n mongodb
+
+### uninstall mongodb
+
+microk8s kubectl delete -f ./kubernetes/kubernetes-mongodb-main/ -n mongodb
 
 ### uninstall helm
 
 helm uninstall <release>  --namespace mongodb
 
-### apply dapr component - Mongo
- TODO
+### apply dapr component - MongoDB
+
+microk8s kubectl delete -f ./kubernetes/redis-state.yaml -n default
 microk8s kubectl apply -f ./kubernetes/statestore-mongodb.yaml -n default
 
 

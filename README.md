@@ -13,12 +13,14 @@ dapr run --app-id order-processor --dapr-http-port 3501
 
 ### Building your image
 cd people
+
 docker build . -t dapr-pilot/node-people-server
 
 
 
 ### Run the image
 cd people
+
 docker compose up
 
 
@@ -29,7 +31,7 @@ docker compose down
 
 ### Go inside the container
 
-docker exec -it <container id> /bin/bash
+docker exec -it \<container id> /bin/bash
 
 
 ## Kubernetes
@@ -41,8 +43,11 @@ microk8s start
 ### install dapr using helm
 
 helm repo add dapr https://dapr.github.io/helm-charts/
+
 helm repo update
+
 microk8s kubectl create namespace dapr-system
+
 helm install dapr dapr/dapr --namespace dapr-system
 
 
@@ -53,8 +58,11 @@ helm search repo dapr --devel --versions
 ### install redis
 
 helm repo add bitnami https://charts.bitnami.com/bitnami
+
 helm repo update
+
 helm install redis bitnami/redis --namespace redis
+
 NAME: redis
 LAST DEPLOYED: Mon May 15 13:46:12 2023
 NAMESPACE: redis
@@ -106,6 +114,7 @@ kubectl get pods --namespace dapr-system
 ### apply dapr component - Redis
 
 microk8s kubectl delete -f ./kubernetes/statestore-mongodb.yaml -n default
+
 microk8s kubectl apply -f ./kubernetes/redis-state.yaml -n default
 
 
@@ -118,15 +127,20 @@ dapr dashboard -k
 microk8s enable registry
 
 cd people
-docker build . -t localhost:32000/node-people-server | docker tag <image_id> localhost:32000/node-people-server 
+
+docker build . -t localhost:32000/node-people-server |
+docker tag \<image_id> localhost:32000/node-people-server 
+
 docker push localhost:32000/node-people-server 
 
 NOTE: Pushing to insecure registry may fail in some versions of Docker unless the daemon is explicitly configured 
 to trust this registry. To address this we need to edit /etc/docker/daemon.json and add:
 
+```json
 {
   "insecure-registries" : ["localhost:32000"]
 }
+```
 
 
 ### deploy service 
@@ -138,44 +152,51 @@ microk8s kubectl apply -f ./kubernetes/deploy.yaml -n default
 
 microk8s kubectl get pods -n default | grep people-node-app
 
-microk8s kubectl logs <pod-id> node
-microk8s kubectl logs <pod-id> daprd
+microk8s kubectl logs \<pod-id> node
+
+microk8s kubectl logs \<pod-id> daprd
 
 
 ### test service
 
 microk8s kubectl get pods -n default | grep people-node-app
-kubectl port-forward <pod-id> 3000:3000 -n default
+
+kubectl port-forward \<pod-id> 3000:3000 -n default
 
 
 ### remove service 
 
 kubectl  get  deployments -n default
+
 microk8s kubectl delete deployment people-node-app -n default
 
 
 ### stop redis
 
 kubectl scale -n redis statefulset redis-replicas --replicas=0
+
 kubectl scale -n redis statefulset redis-master --replicas=0
 
 
 ### start redis
 
 kubectl scale -n redis statefulset redis-replicas --replicas=3
+
 kubectl scale -n redis statefulset redis-master --replicas=1
 
 
 ### install mongodb
 
 microk8s kubectl create namespace mongodb
+
 microk8s kubectl apply -f ./kubernetes/kubernetes-mongodb-main/ -n mongodb
 
 
 ### connect mongodb
 
 microk8s kubectl get pods -n mongodb | grep mongo
-kubectl port-forward <pod-id> 27017:27017 -n mongodb
+
+kubectl port-forward \<pod-id> 27017:27017 -n mongodb
 
 ### uninstall mongodb
 
@@ -185,6 +206,7 @@ microk8s kubectl delete -f ./kubernetes/kubernetes-mongodb-main/ -n mongodb
 ### apply dapr component - MongoDB
 
 microk8s kubectl delete -f ./kubernetes/redis-state.yaml -n default
+
 microk8s kubectl apply -f ./kubernetes/statestore-mongodb.yaml -n default
 
 
